@@ -207,7 +207,7 @@ ApplicationWindow {
 
             Model {
                 id: testCube
-                source: "#Cube"
+                source: fileDialogHelper.fileName
                 materials: PrincipledMaterial {
 
                 }
