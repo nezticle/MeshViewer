@@ -49,6 +49,9 @@ public:
     SubsetListModel* subsetListModel() const;
     SubsetDataTableModel* subsetDataTableModel() const;
 
+    Mesh *mesh() const;
+
+
 public slots:
     void setMeshFile(QUrl meshFile);
 
@@ -56,6 +59,7 @@ signals:
     void meshFileChanged(QUrl meshFile);
     void subsetListModelChanged(SubsetListModel* subsetListModel);
     void subsetDataTableModelChanged(SubsetDataTableModel* subsetDataTableModel);
+    void meshesUpdated();
 
 private:
     void updateSourceMeshFile();

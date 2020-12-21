@@ -1,6 +1,3 @@
-#ifndef MESH_H
-#define MESH_H
-
 /*
  * Copyright (c) 2020 Andy Nichols <nezticle@gmail.com>
  * All rights reserved.
@@ -26,6 +23,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifndef MESH_H
+#define MESH_H
 
 #include <QMatrix4x4>
 #include <QVector3D>

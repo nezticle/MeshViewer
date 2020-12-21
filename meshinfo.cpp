@@ -58,6 +58,14 @@ SubsetDataTableModel *MeshInfo::subsetDataTableModel() const
     return m_subsetDataTableModel;
 }
 
+Mesh *MeshInfo::mesh() const
+{
+    if (m_meshes.isEmpty())
+        return nullptr;
+
+    return m_meshes.first();
+}
+
 void MeshInfo::setMeshFile(QUrl meshFile)
 {
     if (m_meshFile == meshFile)
@@ -86,4 +94,5 @@ void MeshInfo::updateSourceMeshFile()
         m_subsetListModel->setMesh(m_meshes.first());
         m_subsetDataTableModel->setMesh(m_meshes.first());
     }
+    emit meshesUpdated();
 }

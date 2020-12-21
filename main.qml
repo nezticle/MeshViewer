@@ -96,6 +96,8 @@ ApplicationWindow {
             height: 200
             anchors.top: parent.top
             anchors.left: parent.left
+            clip: true
+            currentIndex: 0
             delegate: Item {
                 width: 100
                 height: 25
@@ -144,6 +146,7 @@ ApplicationWindow {
             anchors.left: listView.right
             anchors.right: parent.right
             topMargin: 25
+            clip: true
 
             columnWidthProvider: function (column) {
                 if (column === 0)
@@ -185,43 +188,148 @@ ApplicationWindow {
             }
         }
 
-        View3D {
+        Item {
+            id: viewportContainer
             anchors.top: tableView.bottom
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.right: parent.right
 
-            environment: SceneEnvironment {
-                clearColor: "black"
-                backgroundMode: SceneEnvironment.Color
-            }
-
-            PerspectiveCamera {
-                id: camera
-                z: 200
-            }
-
-            DirectionalLight {
-
-            }
-
-            Model {
-                id: testCube
-                source: fileDialogHelper.fileName
-                materials: PrincipledMaterial {
-
+            Item {
+                id: settingsContainer
+                width: 300
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
+                ColumnLayout {
+                    width: parent.width
+                    Label {
+                        text: "3D View Settings"
+                        font.pointSize: 24
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    GroupBox {
+                        title: "Model Transform"
+                        ColumnLayout {
+                            anchors.fill: parent
+                            RowLayout {
+                                Label {
+                                    text: "Scale"
+                                }
+                                Slider {
+                                    id: scaleSlider
+                                    from: 0.01
+                                    to: 100
+                                    value: 1.0
+                                }
+                            }
+                            RowLayout {
+                                Label {
+                                    text: "Rotation X"
+                                }
+                                Slider {
+                                    id: rotationXSlider
+                                    from: 0
+                                    to: 360
+                                    value: 0
+                                }
+                            }
+                            RowLayout {
+                                Label {
+                                    text: "Rotation Y"
+                                }
+                                Slider {
+                                    id: rotationYSlider
+                                    from: 0
+                                    to: 360
+                                    value: 0
+                                }
+                            }
+                            RowLayout {
+                                Label {
+                                    text: "Rotation Z"
+                                }
+                                Slider {
+                                    id: rotationZSlider
+                                    from: 0
+                                    to: 360
+                                    value: 0
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
-            AxisHelper {
+            View3D {
+                id: view3D
+                anchors.top: parent.top
+                anchors.left: settingsContainer.right
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                environment: SceneEnvironment {
+                    clearColor: "black"
+                    backgroundMode: SceneEnvironment.Color
+                }
 
+                PerspectiveCamera {
+                    id: camera
+                    z: 200
+                }
+
+                DirectionalLight {
+
+                }
+                Node {
+                    id: modelContainer
+                    scale: Qt.vector3d(scaleSlider.value, scaleSlider.value, scaleSlider.value)
+                    eulerRotation: Qt.vector3d(rotationXSlider.value, rotationYSlider.value, rotationZSlider.value)
+                    Model {
+                        id: originalModel
+                        visible: geometryGenerator.original !== null
+                        geometry: geometryGenerator.original
+                        materials: PrincipledMaterial {
+                        }
+                    }
+                }
+
+                GeometryGenerator {
+                    id: geometryGenerator
+                    meshInfo: meshInfo
+                    subsetIndex: listView.currentIndex
+                }
+
+                AxisHelper {
+
+                }
+
+                MouseArea {
+                    id: view3DMouseArea
+                    property bool isInputActive: false
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: {
+                        isInputActive = true
+                        wasdController.focus = true
+                    }
+                    onExited: {
+                        isInputActive = false
+                        wasdController.focus = false
+                    }
+                    onPressed: {
+                        wasdController.focus = true
+                        wasdController.keysEnabled = true
+                    }
+                }
+            }
+
+            WasdController {
+                id: wasdController
+                controlledObject: camera
+                mouseEnabled: view3DMouseArea.isInputActive
+                keysEnabled: view3DMouseArea.isInputActive
             }
 
         }
-
-
     }
-
-
-
 }

@@ -6,6 +6,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 HEADERS += \
     filedialoghelper.h \
+    geometrygenerator.h \
     mesh.h \
     meshinfo.h \
     subsetdatatablemodel.h \
@@ -13,6 +14,7 @@ HEADERS += \
 
 SOURCES += \
     filedialoghelper.cpp \
+    geometrygenerator.cpp \
     main.cpp \
     mesh.cpp \
     meshinfo.cpp \
