@@ -39,6 +39,7 @@ class GeometryGenerator : public QQuick3DObject
     Q_OBJECT
     Q_PROPERTY(QQuick3DGeometry* original READ original NOTIFY originalChanged)
     Q_PROPERTY(QQuick3DGeometry* wireframe READ wireframe NOTIFY wireframeChanged)
+    Q_PROPERTY(QQuick3DGeometry* normals READ normals NOTIFY normalsChanged)
     Q_PROPERTY(MeshInfo* meshInfo READ meshInfo WRITE setMeshInfo NOTIFY meshInfoChanged)
     Q_PROPERTY(int subsetIndex READ subsetIndex WRITE setSubsetIndex NOTIFY subsetIndexChanged)
     QML_ELEMENT
@@ -48,6 +49,7 @@ public:
 
     QQuick3DGeometry* original() const;
     QQuick3DGeometry* wireframe() const;
+    QQuick3DGeometry* normals() const;
     MeshInfo* meshInfo() const;
     int subsetIndex() const;
 
@@ -61,6 +63,7 @@ private slots:
 signals:
     void originalChanged(QQuick3DGeometry* original);
     void wireframeChanged(QQuick3DGeometry* wireframe);
+    void normalsChanged(QQuick3DGeometry* normals);
     void meshInfoChanged(MeshInfo* meshInfo);
     void subsetIndexChanged(int subsetIndex);
 
@@ -68,6 +71,7 @@ private:
     void generate();
     void generateOriginalGeometry();
     void generateWireframeGeometry();
+    void generateNormalGeometry();
 
     QQuick3DGeometry *m_originalGeometry = nullptr;
     QQuick3DGeometry *m_wireframeGeometry = nullptr;

@@ -346,6 +346,17 @@ ApplicationWindow {
                             lighting: PrincipledMaterial.NoLighting
                         }
                     }
+
+                    Model {
+                        id: normalsModel
+                        visible: geometryGenerator.normals !== null && normalsViewCheckBox.checked
+                        geometry: geometryGenerator.normals
+                        materials: PrincipledMaterial {
+                            baseColor: "blue"
+                            cullMode: Material.NoCulling
+                            lighting: PrincipledMaterial.NoLighting
+                        }
+                    }
                 }
 
                 GeometryGenerator {

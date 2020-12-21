@@ -51,6 +51,11 @@ QQuick3DGeometry *GeometryGenerator::wireframe() const
     return m_wireframeGeometry;
 }
 
+QQuick3DGeometry *GeometryGenerator::normals() const
+{
+    return m_normalsLinesGeometry;
+}
+
 MeshInfo *GeometryGenerator::meshInfo() const
 {
     return m_meshInfo;
@@ -129,6 +134,7 @@ void GeometryGenerator::generate()
 
     generateOriginalGeometry();
     generateWireframeGeometry();
+    generateNormalGeometry();
 }
 
 void GeometryGenerator::generateOriginalGeometry()
@@ -290,7 +296,7 @@ void GeometryGenerator::generateWireframeGeometry()
         const QVector3D &pos3 = positions.at(i+2);
         QVector3D normal;
         if (hasNormals) {
-            normal = normals.at(1) + normals.at(2) + normals.at(3);
+            normal = normals.at(i) + normals.at(i+1) + normals.at(i+2);
             normal.normalize();
         } else {
             const QVector3D v = pos2 - pos1;
@@ -335,6 +341,86 @@ void GeometryGenerator::generateWireframeGeometry()
     m_wireframeGeometry->setVertexData(vertexBuffer);
     m_wireframeGeometry->setIndexData(indexBuffer);
     emit wireframeChanged(m_wireframeGeometry);
+}
+
+void GeometryGenerator::generateNormalGeometry()
+{
+    m_normalsLinesGeometry = new QQuick3DGeometry(this);
+    const auto &positions = m_subset->positions();
+    const auto &normals = m_subset->normals();
+    const int count = m_subset->count();
+
+    const quint32 stride = 3 * sizeof(float);
+    const bool hasNormals = normals.count() == count;
+
+    m_normalsLinesGeometry->setStride(stride);
+    m_normalsLinesGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
+    // TODO: Not quite true
+    m_normalsLinesGeometry->setBounds(m_subset->bounds().min, m_subset->bounds().max);
+
+    m_normalsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                                     0,
+                                     QQuick3DGeometry::Attribute::F32Type);
+    m_normalsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                                     0,
+                                     QQuick3DGeometry::Attribute::U32Type);
+
+    // If there are no normals, just do face normals
+    int normalCount = (count / 3);
+    // If there are normals, handle each vertex normals as well
+    if (hasNormals)
+        normalCount += count;
+
+    QByteArray vertexBuffer;
+    vertexBuffer.resize(normalCount * 2 * stride);
+    QVector3D *vp = reinterpret_cast<QVector3D *>(vertexBuffer.data());
+
+    QByteArray indexBuffer;
+    indexBuffer.resize(normalCount * 2 * sizeof(quint32));
+    quint32 *ip = reinterpret_cast<quint32 *>(indexBuffer.data());
+
+    quint32 index = 0;
+    for (int i = 0; i < count; i += 3) {
+        const QVector3D &pos1 = positions.at(i);
+        const QVector3D &pos2 = positions.at(i+1);
+        const QVector3D &pos3 = positions.at(i+2);
+        const QVector3D v = pos2 - pos1;
+        const QVector3D w = pos3 - pos1;
+        const QVector3D faceNormal = QVector3D::crossProduct(v, w).normalized();
+        const QVector3D faceCenter = (pos1 + pos2 + pos3) / 3;
+        *vp++ = faceCenter;
+        *vp++ = faceCenter + faceNormal;
+        *ip++ = index;
+        *ip++ = index + 1;
+        index += 2;
+
+        if (hasNormals) {
+            const QVector3D normal1 = normals.at(i);
+            const QVector3D normal2 = normals.at(i+1);
+            const QVector3D normal3 = normals.at(i+2);
+
+            *vp++ = pos1;
+            *vp++ = pos1 + normal1;
+            *ip++ = index;
+            *ip++ = index + 1;
+
+            *vp++ = pos2;
+            *vp++ = pos2 + normal2;
+            *ip++ = index + 2;
+            *ip++ = index + 3;
+
+            *vp++ = pos3;
+            *vp++ = pos3 + normal3;
+            *ip++ = index + 4;
+            *ip++ = index + 5;
+            index += 6;
+        }
+    }
+
+    m_normalsLinesGeometry->setVertexData(vertexBuffer);
+    m_normalsLinesGeometry->setIndexData(indexBuffer);
+
+    emit normalsChanged(m_normalsLinesGeometry);
 }
 
 QSSGRenderGraphObject *GeometryGenerator::updateSpatialNode(QSSGRenderGraphObject *node)
