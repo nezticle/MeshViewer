@@ -128,6 +128,9 @@ void GeometryGenerator::generateOriginalGeometry()
     const auto &keys = uvs.keys();
     if (keys.count() > 0) {
         for (auto key : keys) {
+            // Only care about UV0 for now... (bugs)
+            if (key != 0)
+                continue;
             const auto &uv = uvs[key];
             if (uv.count() == count) {
                 m_originalGeometry->addAttribute(QQuick3DGeometry::Attribute::TexCoordSemantic,
@@ -181,6 +184,9 @@ void GeometryGenerator::generateOriginalGeometry()
         const auto &keys = uvs.keys();
         if (keys.count() > 0) {
             for (auto key : keys) {
+                // Only care about UV0 for now... (bugs)
+                if (key != 0)
+                    continue;
                 const auto &uv = uvs[key];
                 if (uv.count() == count) {
                     const auto &coord = uv.at(i);
