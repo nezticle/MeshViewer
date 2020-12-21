@@ -210,6 +210,7 @@ ApplicationWindow {
                     }
                     GroupBox {
                         title: "Model Transform"
+                        Layout.fillWidth: true;
                         ColumnLayout {
                             anchors.fill: parent
                             RowLayout {
@@ -258,6 +259,50 @@ ApplicationWindow {
                             }
                         }
                     }
+                    GroupBox {
+                        title: "Views"
+                        Layout.fillWidth: true;
+                        ColumnLayout {
+                            anchors.fill: parent
+                            CheckBox {
+                                id: originalViewCheckBox
+                                checked: true
+                                text: "Original"
+                            }
+                            CheckBox {
+                                id: wireframeViewCheckBox
+                                checked: false
+                                text: "Wireframe"
+                            }
+                            CheckBox {
+                                id: normalsViewCheckBox
+                                checked: false
+                                text: "Normals"
+                            }
+                            CheckBox {
+                                id: tangentsViewCheckBox
+                                checked: false
+                                text: "Tangents"
+                            }
+                            CheckBox {
+                                id: binormalsViewCheckBox
+                                checked: false
+                                text: "Binormals"
+                            }
+                            CheckBox {
+                                id: uvViewCheckBox
+                                checked: false
+                                text: "UV0"
+                            }
+
+                            CheckBox {
+                                id: colorViewCheckBox
+                                checked: false
+                                text: "Vertex Colors"
+                            }
+
+                        }
+                    }
                 }
             }
 
@@ -278,7 +323,7 @@ ApplicationWindow {
                 }
 
                 DirectionalLight {
-
+                    ambientColor: Qt.rgba(0.3, 0.3, 0.3, 1.0)
                 }
                 Node {
                     id: modelContainer
@@ -286,9 +331,19 @@ ApplicationWindow {
                     eulerRotation: Qt.vector3d(rotationXSlider.value, rotationYSlider.value, rotationZSlider.value)
                     Model {
                         id: originalModel
-                        visible: geometryGenerator.original !== null
+                        visible: geometryGenerator.original !== null && originalViewCheckBox.checked
                         geometry: geometryGenerator.original
                         materials: PrincipledMaterial {
+                        }
+                    }
+                    Model {
+                        id: wireframeModel
+                        visible: geometryGenerator.wireframe !== null && wireframeViewCheckBox.checked
+                        geometry: geometryGenerator.wireframe
+                        materials: PrincipledMaterial {
+                            baseColor: "magenta"
+                            cullMode: Material.NoCulling
+                            lighting: PrincipledMaterial.NoLighting
                         }
                     }
                 }

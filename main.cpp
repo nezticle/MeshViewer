@@ -26,12 +26,16 @@
 
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include <QtQuick3D/qquick3d.h>
 
 #include "mesh.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    QSurfaceFormat::setDefaultFormat(QQuick3D::idealSurfaceFormat());
+    qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
