@@ -1,5 +1,12 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>UvCheckerMaterial.qml</file>
+        <file>UVCheckerMap01.png</file>
+        <file>UVChecker.frag</file>
+        <file>UVChecker.vert</file>
+        <file>VertexColorMaterial.qml</file>
+        <file>VertexColor.frag</file>
+        <file>VertexColor.vert</file>
     </qresource>
 </RCC>

@@ -101,7 +101,7 @@ ApplicationWindow {
             delegate: Item {
                 width: 100
                 height: 25
-//                color: "white"
+                //                color: "white"
 
                 Text {
                     anchors.centerIn: parent
@@ -201,106 +201,117 @@ ApplicationWindow {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.bottom: parent.bottom
-                ColumnLayout {
-                    width: parent.width
-                    Label {
-                        text: "3D View Settings"
-                        font.pointSize: 24
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                    GroupBox {
-                        title: "Model Transform"
-                        Layout.fillWidth: true;
-                        ColumnLayout {
-                            anchors.fill: parent
-                            RowLayout {
-                                Label {
-                                    text: "Scale"
+                Flickable {
+                    anchors.fill: parent
+                    contentHeight: settingsLayout.height
+                    clip: true
+                    ColumnLayout {
+                        id: settingsLayout
+                        width: parent.width
+                        Label {
+                            text: "3D View Settings"
+                            font.pointSize: 24
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                        CheckBox {
+                            id: axisHelpersCheckBox
+                            checked: true
+                            text: "Show Axis Helpers"
+                        }
+                        GroupBox {
+                            title: "Model Transform"
+                            Layout.fillWidth: true;
+                            ColumnLayout {
+                                anchors.fill: parent
+                                RowLayout {
+                                    Label {
+                                        text: "Scale"
+                                    }
+                                    Slider {
+                                        id: scaleSlider
+                                        from: 0.01
+                                        to: 100
+                                        value: 1.0
+                                    }
                                 }
-                                Slider {
-                                    id: scaleSlider
-                                    from: 0.01
-                                    to: 100
-                                    value: 1.0
+                                RowLayout {
+                                    Label {
+                                        text: "Rotation X"
+                                    }
+                                    Slider {
+                                        id: rotationXSlider
+                                        from: 0
+                                        to: 360
+                                        value: 0
+                                    }
                                 }
-                            }
-                            RowLayout {
-                                Label {
-                                    text: "Rotation X"
+                                RowLayout {
+                                    Label {
+                                        text: "Rotation Y"
+                                    }
+                                    Slider {
+                                        id: rotationYSlider
+                                        from: 0
+                                        to: 360
+                                        value: 0
+                                    }
                                 }
-                                Slider {
-                                    id: rotationXSlider
-                                    from: 0
-                                    to: 360
-                                    value: 0
-                                }
-                            }
-                            RowLayout {
-                                Label {
-                                    text: "Rotation Y"
-                                }
-                                Slider {
-                                    id: rotationYSlider
-                                    from: 0
-                                    to: 360
-                                    value: 0
-                                }
-                            }
-                            RowLayout {
-                                Label {
-                                    text: "Rotation Z"
-                                }
-                                Slider {
-                                    id: rotationZSlider
-                                    from: 0
-                                    to: 360
-                                    value: 0
+                                RowLayout {
+                                    Label {
+                                        text: "Rotation Z"
+                                    }
+                                    Slider {
+                                        id: rotationZSlider
+                                        from: 0
+                                        to: 360
+                                        value: 0
+                                    }
                                 }
                             }
                         }
-                    }
-                    GroupBox {
-                        title: "Views"
-                        Layout.fillWidth: true;
-                        ColumnLayout {
-                            anchors.fill: parent
-                            CheckBox {
-                                id: originalViewCheckBox
-                                checked: true
-                                text: "Original"
-                            }
-                            CheckBox {
-                                id: wireframeViewCheckBox
-                                checked: false
-                                text: "Wireframe"
-                            }
-                            CheckBox {
-                                id: normalsViewCheckBox
-                                checked: false
-                                text: "Normals"
-                            }
-                            CheckBox {
-                                id: tangentsViewCheckBox
-                                checked: false
-                                text: "Tangents"
-                            }
-                            CheckBox {
-                                id: binormalsViewCheckBox
-                                checked: false
-                                text: "Binormals"
-                            }
-                            CheckBox {
-                                id: uvViewCheckBox
-                                checked: false
-                                text: "UV0"
-                            }
+                        GroupBox {
+                            title: "Views"
+                            Layout.fillWidth: true;
+                            ColumnLayout {
+                                anchors.fill: parent
+                                CheckBox {
+                                    id: originalViewCheckBox
+                                    checked: true
+                                    text: "Original"
+                                }
+                                CheckBox {
+                                    id: wireframeViewCheckBox
+                                    checked: false
+                                    text: "Wireframe"
+                                }
+                                CheckBox {
+                                    id: normalsViewCheckBox
+                                    checked: false
+                                    text: "Normals"
+                                }
+                                CheckBox {
+                                    id: tangentsViewCheckBox
+                                    checked: false
+                                    text: "Tangents"
+                                }
+                                CheckBox {
+                                    id: binormalsViewCheckBox
+                                    checked: false
+                                    text: "Binormals"
+                                }
+                                CheckBox {
+                                    id: uvViewCheckBox
+                                    checked: false
+                                    text: "UV0"
+                                }
 
-                            CheckBox {
-                                id: colorViewCheckBox
-                                checked: false
-                                text: "Vertex Colors"
-                            }
+                                CheckBox {
+                                    id: colorViewCheckBox
+                                    checked: false
+                                    text: "Vertex Colors"
+                                }
 
+                            }
                         }
                     }
                 }
@@ -357,6 +368,43 @@ ApplicationWindow {
                             lighting: PrincipledMaterial.NoLighting
                         }
                     }
+                    Model {
+                        id: tangentsModel
+                        visible: geometryGenerator.tangents !== null && tangentsViewCheckBox.checked
+                        geometry: geometryGenerator.tangents
+                        materials: PrincipledMaterial {
+                            baseColor: "red"
+                            cullMode: Material.NoCulling
+                            lighting: PrincipledMaterial.NoLighting
+                        }
+                    }
+                    Model {
+                        id: binormalsModel
+                        visible: geometryGenerator.binormals !== null && binormalsViewCheckBox.checked
+                        geometry: geometryGenerator.binormals
+                        materials: PrincipledMaterial {
+                            baseColor: "green"
+                            cullMode: Material.NoCulling
+                            lighting: PrincipledMaterial.NoLighting
+                        }
+                    }
+
+                    Model {
+                        id: uvCheckerModel
+                        visible: geometryGenerator.original !== null && uvViewCheckBox.checked
+                        geometry: geometryGenerator.original
+                        materials: UvCheckerMaterial {
+
+                        }
+                    }
+                    Model {
+                        id: vertexColorModel
+                        visible: geometryGenerator.original !== null && colorViewCheckBox.checked
+                        geometry: geometryGenerator.original
+                        materials: VertexColorMaterial {
+
+                        }
+                    }
                 }
 
                 GeometryGenerator {
@@ -366,7 +414,7 @@ ApplicationWindow {
                 }
 
                 AxisHelper {
-
+                    visible: axisHelpersCheckBox.checked
                 }
 
                 MouseArea {

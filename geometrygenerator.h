@@ -40,6 +40,8 @@ class GeometryGenerator : public QQuick3DObject
     Q_PROPERTY(QQuick3DGeometry* original READ original NOTIFY originalChanged)
     Q_PROPERTY(QQuick3DGeometry* wireframe READ wireframe NOTIFY wireframeChanged)
     Q_PROPERTY(QQuick3DGeometry* normals READ normals NOTIFY normalsChanged)
+    Q_PROPERTY(QQuick3DGeometry* tangents READ tangents NOTIFY tangentsChanged)
+    Q_PROPERTY(QQuick3DGeometry* binormals READ binormals NOTIFY binormalsChanged)
     Q_PROPERTY(MeshInfo* meshInfo READ meshInfo WRITE setMeshInfo NOTIFY meshInfoChanged)
     Q_PROPERTY(int subsetIndex READ subsetIndex WRITE setSubsetIndex NOTIFY subsetIndexChanged)
     QML_ELEMENT
@@ -50,6 +52,8 @@ public:
     QQuick3DGeometry* original() const;
     QQuick3DGeometry* wireframe() const;
     QQuick3DGeometry* normals() const;
+    QQuick3DGeometry* tangents() const;
+    QQuick3DGeometry* binormals() const;
     MeshInfo* meshInfo() const;
     int subsetIndex() const;
 
@@ -64,6 +68,8 @@ signals:
     void originalChanged(QQuick3DGeometry* original);
     void wireframeChanged(QQuick3DGeometry* wireframe);
     void normalsChanged(QQuick3DGeometry* normals);
+    void tangentsChanged(QQuick3DGeometry* tangents);
+    void binormalsChanged(QQuick3DGeometry* binormals);
     void meshInfoChanged(MeshInfo* meshInfo);
     void subsetIndexChanged(int subsetIndex);
 
@@ -72,6 +78,8 @@ private:
     void generateOriginalGeometry();
     void generateWireframeGeometry();
     void generateNormalGeometry();
+    void generateTangentGeometry();
+    void generateBinormalGeometry();
 
     QQuick3DGeometry *m_originalGeometry = nullptr;
     QQuick3DGeometry *m_wireframeGeometry = nullptr;

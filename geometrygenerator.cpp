@@ -56,6 +56,16 @@ QQuick3DGeometry *GeometryGenerator::normals() const
     return m_normalsLinesGeometry;
 }
 
+QQuick3DGeometry *GeometryGenerator::tangents() const
+{
+    return m_tangetsLinesGeometry;
+}
+
+QQuick3DGeometry *GeometryGenerator::binormals() const
+{
+    return m_binormalsLinesGeometry;
+}
+
 MeshInfo *GeometryGenerator::meshInfo() const
 {
     return m_meshInfo;
@@ -135,6 +145,8 @@ void GeometryGenerator::generate()
     generateOriginalGeometry();
     generateWireframeGeometry();
     generateNormalGeometry();
+    generateTangentGeometry();
+    generateBinormalGeometry();
 }
 
 void GeometryGenerator::generateOriginalGeometry()
@@ -273,14 +285,14 @@ void GeometryGenerator::generateWireframeGeometry()
     m_wireframeGeometry->setBounds(m_subset->bounds().min, m_subset->bounds().max);
 
     m_wireframeGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
-                                     0,
-                                     QQuick3DGeometry::Attribute::F32Type);
+                                      0,
+                                      QQuick3DGeometry::Attribute::F32Type);
     m_wireframeGeometry->addAttribute(QQuick3DGeometry::Attribute::NormalSemantic,
-                                     3 * sizeof(float),
-                                     QQuick3DGeometry::Attribute::F32Type);
+                                      3 * sizeof(float),
+                                      QQuick3DGeometry::Attribute::F32Type);
     m_wireframeGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
-                                     0,
-                                     QQuick3DGeometry::Attribute::U32Type);
+                                      0,
+                                      QQuick3DGeometry::Attribute::U32Type);
 
     QByteArray vertexBuffer;
     vertexBuffer.resize(count * stride);
@@ -359,11 +371,11 @@ void GeometryGenerator::generateNormalGeometry()
     m_normalsLinesGeometry->setBounds(m_subset->bounds().min, m_subset->bounds().max);
 
     m_normalsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
-                                     0,
-                                     QQuick3DGeometry::Attribute::F32Type);
+                                         0,
+                                         QQuick3DGeometry::Attribute::F32Type);
     m_normalsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
-                                     0,
-                                     QQuick3DGeometry::Attribute::U32Type);
+                                         0,
+                                         QQuick3DGeometry::Attribute::U32Type);
 
     // If there are no normals, just do face normals
     int normalCount = (count / 3);
@@ -421,6 +433,140 @@ void GeometryGenerator::generateNormalGeometry()
     m_normalsLinesGeometry->setIndexData(indexBuffer);
 
     emit normalsChanged(m_normalsLinesGeometry);
+}
+
+void GeometryGenerator::generateTangentGeometry()
+{
+    const auto &positions = m_subset->positions();
+    const auto &tangents = m_subset->tangents();
+    const int count = m_subset->count();
+
+    const quint32 stride = 3 * sizeof(float);
+    const bool hasTangents = tangents.count() == count;
+
+    if (!hasTangents)
+        return;
+
+    m_tangetsLinesGeometry = new QQuick3DGeometry(this);
+
+    m_tangetsLinesGeometry->setStride(stride);
+    m_tangetsLinesGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
+    // TODO: Not quite true
+    m_tangetsLinesGeometry->setBounds(m_subset->bounds().min, m_subset->bounds().max);
+
+    m_tangetsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                                         0,
+                                         QQuick3DGeometry::Attribute::F32Type);
+    m_tangetsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                                         0,
+                                         QQuick3DGeometry::Attribute::U32Type);
+
+    QByteArray vertexBuffer;
+    vertexBuffer.resize(count * 2 * stride);
+    QVector3D *vp = reinterpret_cast<QVector3D *>(vertexBuffer.data());
+
+    QByteArray indexBuffer;
+    indexBuffer.resize(count * 2 * sizeof(quint32));
+    quint32 *ip = reinterpret_cast<quint32 *>(indexBuffer.data());
+
+    quint32 index = 0;
+    for (int i = 0; i < count; i += 3) {
+        const QVector3D &pos1 = positions.at(i);
+        const QVector3D &pos2 = positions.at(i+1);
+        const QVector3D &pos3 = positions.at(i+2);
+
+        const QVector3D tangent1 = tangents.at(i);
+        const QVector3D tangent2 = tangents.at(i+1);
+        const QVector3D tangent3 = tangents.at(i+2);
+
+        *vp++ = pos1;
+        *vp++ = pos1 + tangent1;
+        *ip++ = index;
+        *ip++ = index + 1;
+
+        *vp++ = pos2;
+        *vp++ = pos2 + tangent2;
+        *ip++ = index + 2;
+        *ip++ = index + 3;
+
+        *vp++ = pos3;
+        *vp++ = pos3 + tangent3;
+        *ip++ = index + 4;
+        *ip++ = index + 5;
+        index += 6;
+    }
+
+    m_tangetsLinesGeometry->setVertexData(vertexBuffer);
+    m_tangetsLinesGeometry->setIndexData(indexBuffer);
+
+    emit tangentsChanged(m_tangetsLinesGeometry);
+}
+
+void GeometryGenerator::generateBinormalGeometry()
+{
+    const auto &positions = m_subset->positions();
+    const auto &binormals = m_subset->binormals();
+    const int count = m_subset->count();
+
+    const quint32 stride = 3 * sizeof(float);
+    const bool hasBinormals = binormals.count() == count;
+
+    if (!hasBinormals)
+        return;
+
+    m_binormalsLinesGeometry = new QQuick3DGeometry(this);
+
+    m_binormalsLinesGeometry->setStride(stride);
+    m_binormalsLinesGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
+    // TODO: Not quite true
+    m_binormalsLinesGeometry->setBounds(m_subset->bounds().min, m_subset->bounds().max);
+
+    m_binormalsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                                           0,
+                                           QQuick3DGeometry::Attribute::F32Type);
+    m_binormalsLinesGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                                           0,
+                                           QQuick3DGeometry::Attribute::U32Type);
+
+    QByteArray vertexBuffer;
+    vertexBuffer.resize(count * 2 * stride);
+    QVector3D *vp = reinterpret_cast<QVector3D *>(vertexBuffer.data());
+
+    QByteArray indexBuffer;
+    indexBuffer.resize(count * 2 * sizeof(quint32));
+    quint32 *ip = reinterpret_cast<quint32 *>(indexBuffer.data());
+
+    quint32 index = 0;
+    for (int i = 0; i < count; i += 3) {
+        const QVector3D &pos1 = positions.at(i);
+        const QVector3D &pos2 = positions.at(i+1);
+        const QVector3D &pos3 = positions.at(i+2);
+
+        const QVector3D binormal1 = binormals.at(i);
+        const QVector3D binormal2 = binormals.at(i+1);
+        const QVector3D binormal3 = binormals.at(i+2);
+
+        *vp++ = pos1;
+        *vp++ = pos1 + binormal1;
+        *ip++ = index;
+        *ip++ = index + 1;
+
+        *vp++ = pos2;
+        *vp++ = pos2 + binormal2;
+        *ip++ = index + 2;
+        *ip++ = index + 3;
+
+        *vp++ = pos3;
+        *vp++ = pos3 + binormal3;
+        *ip++ = index + 4;
+        *ip++ = index + 5;
+        index += 6;
+    }
+
+    m_binormalsLinesGeometry->setVertexData(vertexBuffer);
+    m_binormalsLinesGeometry->setIndexData(indexBuffer);
+
+    emit binormalsChanged(m_binormalsLinesGeometry);
 }
 
 QSSGRenderGraphObject *GeometryGenerator::updateSpatialNode(QSSGRenderGraphObject *node)
