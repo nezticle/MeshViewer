@@ -40,6 +40,9 @@ ApplicationWindow {
     FileDialogHelper {
         id: fileDialogHelper
     }
+    ColorDialogHelper {
+        id: colorDialogHelper
+    }
 
     Action {
         id: openMeshFileAction
@@ -218,6 +221,22 @@ ApplicationWindow {
                             checked: true
                             text: "Show Axis Helpers"
                         }
+                        RowLayout {
+                            Label {
+                                text: "Background Color"
+                            }
+                            Rectangle {
+                                width: 75
+                                height: 25
+                                color: colorDialogHelper.color
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked:
+                                        colorDialogHelper.selectColor();
+                                }
+                            }
+                        }
+
                         GroupBox {
                             title: "Model Transform"
                             Layout.fillWidth: true;
@@ -324,7 +343,7 @@ ApplicationWindow {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 environment: SceneEnvironment {
-                    clearColor: "black"
+                    clearColor: colorDialogHelper.color
                     backgroundMode: SceneEnvironment.Color
                 }
 

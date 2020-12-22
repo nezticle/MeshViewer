@@ -5,6 +5,7 @@ QML_IMPORT_NAME = MeshViewer
 QML_IMPORT_MAJOR_VERSION = 1
 
 HEADERS += \
+    colordialoghelper.h \
     filedialoghelper.h \
     geometrygenerator.h \
     mesh.h \
@@ -13,6 +14,7 @@ HEADERS += \
     subsetlistmodel.h
 
 SOURCES += \
+    colordialoghelper.cpp \
     filedialoghelper.cpp \
     geometrygenerator.cpp \
     main.cpp \
