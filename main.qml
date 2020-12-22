@@ -181,15 +181,31 @@ ApplicationWindow {
                     }
                 }
             }
+            Connections {
+                target: meshInfo.subsetDataTableModel
+                function onModelReset() {
+                    tableView.selectedRow = -1;
+                }
+            }
 
+            property int selectedRow: -1
             delegate: Rectangle {
                 implicitWidth: 200
                 implicitHeight: 25
-                color: "white"
+                color: row === tableView.selectedRow ? "green" : "white"
                 border.width: 1
                 Text {
                     anchors.centerIn: parent
                     text: display
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (tableView.selectedRow != row)
+                            tableView.selectedRow = row
+                        else
+                            tableView.selectedRow = -1
+                    }
                 }
             }
         }
@@ -494,6 +510,17 @@ ApplicationWindow {
                         materials: VertexColorMaterial {
 
                         }
+                    }
+                    Model {
+                        id: vertexSelectionModel
+                        visible: tableView.selectedRow !== -1
+                        source: "#Sphere"
+                        scale: Qt.vector3d(0.01, 0.01, 0.01)
+                        materials: PrincipledMaterial {
+                            baseColor: "yellow"
+                            lighting: PrincipledMaterial.NoLighting
+                        }
+                        position: meshInfo.subsetDataTableModel.vertexPositionAtRow(tableView.selectedRow)
                     }
                 }
 

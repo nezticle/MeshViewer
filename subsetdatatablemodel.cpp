@@ -253,3 +253,16 @@ QVariant SubsetDataTableModel::headerData(int section, Qt::Orientation orientati
     const auto &attributeField = m_fields[section - 1];
     return attributeField.headerName;
 }
+
+QVector3D SubsetDataTableModel::vertexPositionAtRow(int row)
+{
+    if (row < 0 || row > rowCount(QModelIndex()))
+        return QVector3D();
+
+    const auto &subsets = m_mesh->subsets();
+    if (m_subsetIndex > subsets.count())
+        return QVector3D();
+
+    const auto &subset = subsets[m_subsetIndex];
+    return subset->positions().at(row);
+}

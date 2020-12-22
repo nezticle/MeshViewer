@@ -49,6 +49,8 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    Q_INVOKABLE QVector3D vertexPositionAtRow(int row);
+
 public slots:
     void setMesh(Mesh* mesh);
     void setSubsetIndex(int subsetIndex);
