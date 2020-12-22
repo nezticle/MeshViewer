@@ -100,6 +100,7 @@ ApplicationWindow {
             anchors.top: parent.top
             anchors.left: parent.left
             clip: true
+            ScrollBar.vertical: ScrollBar { }
             currentIndex: 0
             delegate: Item {
                 width: 100
@@ -150,6 +151,8 @@ ApplicationWindow {
             anchors.right: parent.right
             topMargin: 25
             clip: true
+            ScrollBar.vertical: ScrollBar { }
+            ScrollBar.horizontal: ScrollBar { }
 
             columnWidthProvider: function (column) {
                 if (column === 0)
@@ -208,6 +211,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     contentHeight: settingsLayout.height
                     clip: true
+                    ScrollBar.vertical: ScrollBar { }
                     ColumnLayout {
                         id: settingsLayout
                         width: parent.width
