@@ -40,6 +40,7 @@ class MeshInfo : public QObject
     Q_PROPERTY(QUrl meshFile READ meshFile WRITE setMeshFile NOTIFY meshFileChanged)
     Q_PROPERTY(SubsetListModel* subsetListModel READ subsetListModel NOTIFY subsetListModelChanged)
     Q_PROPERTY(SubsetDataTableModel* subsetDataTableModel READ subsetDataTableModel NOTIFY subsetDataTableModelChanged)
+    Q_PROPERTY(QString meshName READ meshName NOTIFY meshNameChanged)
     QML_ELEMENT
 public:
     explicit MeshInfo(QObject *parent = nullptr);
@@ -50,7 +51,7 @@ public:
     SubsetDataTableModel* subsetDataTableModel() const;
 
     Mesh *mesh() const;
-
+    QString meshName() const;
 
 public slots:
     void setMeshFile(QUrl meshFile);
@@ -60,6 +61,7 @@ signals:
     void subsetListModelChanged(SubsetListModel* subsetListModel);
     void subsetDataTableModelChanged(SubsetDataTableModel* subsetDataTableModel);
     void meshesUpdated();
+    void meshNameChanged(QString meshName);
 
 private:
     void updateSourceMeshFile();
@@ -68,6 +70,7 @@ private:
     SubsetDataTableModel* m_subsetDataTableModel = nullptr;
     QVector<Mesh *> m_meshes;
     MeshFileTool m_meshFileTool;
+    QString m_meshName;
 };
 
 #endif // MESHINFO_H

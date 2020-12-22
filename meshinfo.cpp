@@ -28,6 +28,7 @@
 
 #include <QtQml/QQmlFile>
 #include <QtQml/QQmlContext>
+#include <QFileInfo>
 
 MeshInfo::MeshInfo(QObject *parent) : QObject(parent)
 {
@@ -66,6 +67,11 @@ Mesh *MeshInfo::mesh() const
     return m_meshes.first();
 }
 
+QString MeshInfo::meshName() const
+{
+    return m_meshName;
+}
+
 void MeshInfo::setMeshFile(QUrl meshFile)
 {
     if (m_meshFile == meshFile)
@@ -80,6 +86,9 @@ void MeshInfo::updateSourceMeshFile()
 {
     const QQmlContext *context = qmlContext(this);
     const QString meshPath = QQmlFile::urlToLocalFileOrQrc(context ? context->resolvedUrl(m_meshFile) : m_meshFile);
+    QFileInfo fileInfo(meshPath);
+    m_meshName = fileInfo.fileName();
+    emit meshNameChanged(m_meshName);
 
     // Cleanup
     m_subsetListModel->setMesh(nullptr);

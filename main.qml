@@ -34,7 +34,7 @@ import MeshViewer
 ApplicationWindow {
     width: 1280
     height: 720
-    title: qsTr("Mesh File Viewer")
+    title: qsTr("Mesh File Viewer") + " " + meshInfo.meshName
     visible: true
 
     FileDialogHelper {
@@ -242,48 +242,115 @@ ApplicationWindow {
                             Layout.fillWidth: true;
                             ColumnLayout {
                                 anchors.fill: parent
-                                RowLayout {
+                                ColumnLayout {
+
                                     Label {
                                         text: "Scale"
                                     }
-                                    Slider {
-                                        id: scaleSlider
-                                        from: 0.01
-                                        to: 100
-                                        value: 1.0
+                                    RowLayout {
+                                        Slider {
+                                            id: scaleSlider
+                                            from: 0.01
+                                            to: 100
+                                            value: 1.0
+                                            Layout.fillWidth: true
+                                        }
+                                        TextField {
+                                            text: scaleSlider.value
+                                            maximumLength: 5
+                                            Layout.preferredWidth: 50
+                                            validator: DoubleValidator {
+                                                bottom: scaleSlider.from
+                                                top: scaleSlider.to
+                                                decimals: 2
+                                            }
+                                            onAccepted: {
+                                                scaleSlider.value = text
+                                            }
+                                        }
                                     }
                                 }
-                                RowLayout {
+                                ColumnLayout {
                                     Label {
                                         text: "Rotation X"
                                     }
-                                    Slider {
-                                        id: rotationXSlider
-                                        from: 0
-                                        to: 360
-                                        value: 0
+                                    RowLayout {
+                                        Slider {
+                                            id: rotationXSlider
+                                            from: 0
+                                            to: 360
+                                            value: 0
+                                            Layout.fillWidth: true
+                                        }
+                                        TextField {
+                                            text: rotationXSlider.value
+                                            maximumLength: 5
+                                            Layout.preferredWidth: 50
+                                            validator: DoubleValidator {
+                                                bottom: rotationXSlider.from
+                                                top: rotationXSlider.to
+                                                decimals: 2
+                                            }
+                                            onAccepted: {
+                                                rotationXSlider.value = text
+                                            }
+                                        }
                                     }
                                 }
-                                RowLayout {
+                                ColumnLayout {
                                     Label {
                                         text: "Rotation Y"
                                     }
-                                    Slider {
-                                        id: rotationYSlider
-                                        from: 0
-                                        to: 360
-                                        value: 0
+                                    RowLayout {
+                                        Slider {
+                                            id: rotationYSlider
+                                            from: 0
+                                            to: 360
+                                            value: 0
+                                            width: 100
+                                            Layout.fillWidth: true
+                                        }
+                                        TextField {
+                                            text: rotationYSlider.value
+                                            maximumLength: 5
+                                            Layout.preferredWidth: 50
+                                            validator: DoubleValidator {
+                                                bottom: rotationYSlider.from
+                                                top: rotationYSlider.to
+                                                decimals: 2
+                                            }
+                                            onAccepted: {
+                                                rotationYSlider.value = text
+                                            }
+                                        }
                                     }
                                 }
-                                RowLayout {
+                                ColumnLayout {
+                                    width: parent.width
                                     Label {
                                         text: "Rotation Z"
                                     }
-                                    Slider {
-                                        id: rotationZSlider
-                                        from: 0
-                                        to: 360
-                                        value: 0
+                                    RowLayout {
+                                        Slider {
+                                            id: rotationZSlider
+                                            from: 0
+                                            to: 360
+                                            value: 0
+                                            Layout.fillWidth: true
+                                        }
+                                        TextField {
+                                            text: rotationZSlider.value
+                                            maximumLength: 5
+                                            Layout.preferredWidth: 50
+                                            validator: DoubleValidator {
+                                                bottom: rotationZSlider.from
+                                                top: rotationZSlider.to
+                                                decimals: 2
+                                            }
+                                            onAccepted: {
+                                                rotationZSlider.value = text
+                                            }
+                                        }
                                     }
                                 }
                             }
