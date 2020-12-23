@@ -41,7 +41,7 @@ jobs:
         modules: 'qtquick3d qtquicktimeline qtshadertools'
 
     - name: Configure MSVC console
-      if matrix.config.os = 'windows-latest'
+      if: matrix.config.os = 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
       with:
         toolset: 14.2
