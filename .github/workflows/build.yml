@@ -27,10 +27,10 @@ jobs:
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
             os: ubuntu-20.04
           }
-        # - {
-        #     name: "macOS Latest x64", artifact: "macOS-x64.zip",
-        #     os: macos-latest
-        #   }
+        - {
+            name: "macOS Latest x64", artifact: "macOS-x64.zip",
+            os: macos-latest
+          }
     steps:
     - uses: actions/checkout@v1
 
