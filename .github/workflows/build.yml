@@ -47,13 +47,20 @@ jobs:
         toolset: 14.2
         arch: ${{ matrix.arch }}
 
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build
 
-    - name: Configure CMake
-      working-directory: ${{runner.workspace}}/build
-      run: cmake ${{runner.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - name: "Build"
+    - run: |
+      mkdir build
+      cd build
+      cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      cmake --build . --config $BUILD_TYPE
+    # - name: Create Build Environment
+    #   run: cmake -E make_directory ${{runner.workspace}}/build
 
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      run: cmake --build . --config $BUILD_TYPE
+    # - name: Configure CMake
+    #   working-directory: ${{runner.workspace}}/build
+    #   run: cmake ${{runner.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    # - name: Build
+    #   working-directory: ${{runner.workspace}}/build
+    #   run: cmake --build . --config $BUILD_TYPE
