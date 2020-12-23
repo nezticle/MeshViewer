@@ -49,15 +49,17 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       
       run: |
-        if ("${ { runner.os } }" STREQUAL "Windows" AND NOT "x${ { matrix.config.environment_script } }" STREQUAL "x")
+        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
           execute_process(
-            COMMAND "${ { matrix.config.environment_script } }" && set
+            COMMAND "${{ matrix.config.environment_script }}" && set
             OUTPUT_FILE environment_script_output.txt
           )
           file(STRINGS environment_script_output.txt output_lines)
           foreach(line IN LISTS output_lines)
             if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
-              set(ENV{${CMAKE_MATCH_1} } "${CMAKE_MATCH_2}")
+              set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+              # Set for other steps
+              message("::set-env name=${CMAKE_MATCH_1}::${CMAKE_MATCH_2}")
             endif()
           endforeach()
         endif()
@@ -67,15 +69,17 @@ jobs:
       shell: cmake -P {0}
       working-directory: ${{runner.workspace}}/build
       run: |
-        if ("${ { runner.os } }" STREQUAL "Windows" AND NOT "x${ { matrix.config.environment_script } }" STREQUAL "x")
+        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
           execute_process(
-            COMMAND "${ { matrix.config.environment_script } }" && set
+            COMMAND "${{ matrix.config.environment_script }}" && set
             OUTPUT_FILE environment_script_output.txt
           )
           file(STRINGS environment_script_output.txt output_lines)
           foreach(line IN LISTS output_lines)
             if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
-              set(ENV{${CMAKE_MATCH_1} } "${CMAKE_MATCH_2}")
+              set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+              # Set for other steps
+              message("::set-env name=${CMAKE_MATCH_1}::${CMAKE_MATCH_2}")
             endif()
           endforeach()
         endif()
