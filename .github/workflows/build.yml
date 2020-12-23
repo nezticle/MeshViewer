@@ -18,11 +18,11 @@ jobs:
             os: windows-latest,
             arch: x64
           }
-        # - {
-        #     name: "Windows Latest x86", artifact: "Windows-x86.zip",
-        #     os: windows-latest,
-        #     arch: x86
-        #   }
+        - {
+            name: "Windows Latest x86", artifact: "Windows-x86.zip",
+            os: windows-latest,
+            arch: x86
+          }
         - {
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
             os: ubuntu-20.04
