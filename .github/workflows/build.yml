@@ -41,7 +41,6 @@ jobs:
         modules: 'qtquick3d qtquicktimeline qtshadertools'
 
     - name: Create Build Environment
-      shell: cmake -P {0}
       run: cmake -E make_directory ${{runner.workspace}}/build
 
     - name: Configure CMake
