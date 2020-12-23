@@ -19,11 +19,6 @@ jobs:
             arch: x64
           }
         - {
-            name: "Windows Latest x86", artifact: "Windows-x86.zip",
-            os: windows-latest,
-            arch: x86
-          }
-        - {
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
             os: ubuntu-20.04
           }
@@ -34,11 +29,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v1
+      with:
+        path: ../Qt
+        key: ${{ runner.os }}-QtCache
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: '6.0.0'
         modules: 'qtquick3d qtquicktimeline qtshadertools'
+        cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
     - name: Configure MSVC console
       if: matrix.config.os == 'windows-latest'
@@ -54,13 +57,5 @@ jobs:
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
         cmake --build . --config $BUILD_TYPE
-    # - name: Create Build Environment
-    #   run: cmake -E make_directory ${{runner.workspace}}/build
 
-    # - name: Configure CMake
-    #   working-directory: ${{runner.workspace}}/build
-    #   run: cmake ${{runner.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-    # - name: Build
-    #   working-directory: ${{runner.workspace}}/build
-    #   run: cmake --build . --config $BUILD_TYPE
