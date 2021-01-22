@@ -76,6 +76,11 @@ int GeometryGenerator::subsetIndex() const
     return m_subsetIndex;
 }
 
+float GeometryGenerator::scaleFactor() const
+{
+    return m_scaleFactor;
+}
+
 void GeometryGenerator::setMeshInfo(MeshInfo *meshInfo)
 {
     if (m_meshInfo == meshInfo)
@@ -119,6 +124,12 @@ void GeometryGenerator::updateSubset()
         return;
 
     m_subset = subset;
+    // Update Scale Factor
+    // Scale factor is 1/100 of the largest bounds extents
+    const QVector3D extents = m_subset->bounds().max - m_subset->bounds().min;
+    float maxExtent = qMax(qMax(extents.x(), extents.y()), extents.z());
+    m_scaleFactor = maxExtent / 100.0f;
+    emit scaleFactorChanged(m_scaleFactor);
     generate();
 }
 
@@ -401,7 +412,7 @@ void GeometryGenerator::generateNormalGeometry()
         const QVector3D faceNormal = QVector3D::crossProduct(v, w).normalized();
         const QVector3D faceCenter = (pos1 + pos2 + pos3) / 3;
         *vp++ = faceCenter;
-        *vp++ = faceCenter + faceNormal;
+        *vp++ = faceCenter + faceNormal * m_scaleFactor;
         *ip++ = index;
         *ip++ = index + 1;
         index += 2;
@@ -412,17 +423,17 @@ void GeometryGenerator::generateNormalGeometry()
             const QVector3D normal3 = normals.at(i+2);
 
             *vp++ = pos1;
-            *vp++ = pos1 + normal1;
+            *vp++ = pos1 + normal1 * m_scaleFactor;
             *ip++ = index;
             *ip++ = index + 1;
 
             *vp++ = pos2;
-            *vp++ = pos2 + normal2;
+            *vp++ = pos2 + normal2 * m_scaleFactor;
             *ip++ = index + 2;
             *ip++ = index + 3;
 
             *vp++ = pos3;
-            *vp++ = pos3 + normal3;
+            *vp++ = pos3 + normal3 * m_scaleFactor;
             *ip++ = index + 4;
             *ip++ = index + 5;
             index += 6;
@@ -480,17 +491,17 @@ void GeometryGenerator::generateTangentGeometry()
         const QVector3D tangent3 = tangents.at(i+2);
 
         *vp++ = pos1;
-        *vp++ = pos1 + tangent1;
+        *vp++ = pos1 + tangent1 * m_scaleFactor;
         *ip++ = index;
         *ip++ = index + 1;
 
         *vp++ = pos2;
-        *vp++ = pos2 + tangent2;
+        *vp++ = pos2 + tangent2 * m_scaleFactor;
         *ip++ = index + 2;
         *ip++ = index + 3;
 
         *vp++ = pos3;
-        *vp++ = pos3 + tangent3;
+        *vp++ = pos3 + tangent3 * m_scaleFactor;
         *ip++ = index + 4;
         *ip++ = index + 5;
         index += 6;
@@ -547,17 +558,17 @@ void GeometryGenerator::generateBinormalGeometry()
         const QVector3D binormal3 = binormals.at(i+2);
 
         *vp++ = pos1;
-        *vp++ = pos1 + binormal1;
+        *vp++ = pos1 + binormal1 * m_scaleFactor;
         *ip++ = index;
         *ip++ = index + 1;
 
         *vp++ = pos2;
-        *vp++ = pos2 + binormal2;
+        *vp++ = pos2 + binormal2 * m_scaleFactor;
         *ip++ = index + 2;
         *ip++ = index + 3;
 
         *vp++ = pos3;
-        *vp++ = pos3 + binormal3;
+        *vp++ = pos3 + binormal3 * m_scaleFactor;
         *ip++ = index + 4;
         *ip++ = index + 5;
         index += 6;

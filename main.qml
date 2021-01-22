@@ -392,16 +392,19 @@ ApplicationWindow {
                                 }
                                 CheckBox {
                                     id: normalsViewCheckBox
+                                    enabled: geometryGenerator.normals !== null
                                     checked: false
                                     text: "Normals"
                                 }
                                 CheckBox {
                                     id: tangentsViewCheckBox
+                                    enabled: geometryGenerator.tangents !== null
                                     checked: false
                                     text: "Tangents"
                                 }
                                 CheckBox {
                                     id: binormalsViewCheckBox
+                                    enabled: geometryGenerator.binormals !== null
                                     checked: false
                                     text: "Binormals"
                                 }
@@ -515,7 +518,9 @@ ApplicationWindow {
                         id: vertexSelectionModel
                         visible: tableView.selectedRow !== -1
                         source: "#Sphere"
-                        scale: Qt.vector3d(0.01, 0.01, 0.01)
+                        scale: Qt.vector3d(0.01 * geometryGenerator.scaleFactor,
+                                           0.01 * geometryGenerator.scaleFactor,
+                                           0.01 * geometryGenerator.scaleFactor)
                         materials: PrincipledMaterial {
                             baseColor: "yellow"
                             lighting: PrincipledMaterial.NoLighting

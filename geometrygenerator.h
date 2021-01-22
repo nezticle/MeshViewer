@@ -44,6 +44,7 @@ class GeometryGenerator : public QQuick3DObject
     Q_PROPERTY(QQuick3DGeometry* binormals READ binormals NOTIFY binormalsChanged)
     Q_PROPERTY(MeshInfo* meshInfo READ meshInfo WRITE setMeshInfo NOTIFY meshInfoChanged)
     Q_PROPERTY(int subsetIndex READ subsetIndex WRITE setSubsetIndex NOTIFY subsetIndexChanged)
+    Q_PROPERTY(float scaleFactor READ scaleFactor NOTIFY scaleFactorChanged)
     QML_ELEMENT
 public:
     GeometryGenerator(QQuick3DObject *parent = nullptr);
@@ -56,6 +57,7 @@ public:
     QQuick3DGeometry* binormals() const;
     MeshInfo* meshInfo() const;
     int subsetIndex() const;
+    float scaleFactor() const;
 
 public slots:
     void setMeshInfo(MeshInfo* meshInfo);
@@ -72,6 +74,7 @@ signals:
     void binormalsChanged(QQuick3DGeometry* binormals);
     void meshInfoChanged(MeshInfo* meshInfo);
     void subsetIndexChanged(int subsetIndex);
+    void scaleFactorChanged(float scaleFactor);
 
 private:
     void generate();
@@ -90,8 +93,8 @@ private:
     Mesh::Subset *m_subset = nullptr;
     MeshInfo* m_meshInfo = nullptr;
     int m_subsetIndex = 0;
+    float m_scaleFactor = 1.0f;
 
-    // QQuick3DObject interface
 protected:
     QSSGRenderGraphObject *updateSpatialNode(QSSGRenderGraphObject *node) override;
 };
