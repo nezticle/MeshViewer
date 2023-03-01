@@ -140,7 +140,7 @@ private:
         quint32 sizeInBytes = 0;
 
         bool isValid() {
-            return fileId == 3365961549 && fileVersion == 3;
+            return fileId == 3365961549 && fileVersion >= 3;
         }
     };
 

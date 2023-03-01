@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.14)
-project(MeshViewer LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.16)
+project(MeshViewer VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
@@ -21,6 +20,7 @@ qt_add_executable(MeshViewer
     meshinfo.cpp meshinfo.h
     subsetdatatablemodel.cpp subsetdatatablemodel.h
     subsetlistmodel.cpp subsetlistmodel.h
+    meshviewerapplication.h meshviewerapplication.cpp
     main.cpp
 )
 set_target_properties(MeshViewer PROPERTIES
@@ -35,28 +35,20 @@ target_link_libraries(MeshViewer PUBLIC
     Qt::Widgets
 )
 
-# Resources:
-set(qml_resource_files
-    "main.qml"
-    "UvCheckerMaterial.qml"
-    "UVCheckerMap01.png"
-    "UVChecker.frag"
-    "UVChecker.vert"
-    "VertexColorMaterial.qml"
-    "VertexColor.frag"
-    "VertexColor.vert"
+qt_add_qml_module(MeshViewer
+    URI "MeshViewer"
+    VERSION "${PROJECT_VERSION}"
+    QML_FILES
+        main.qml
+        UvCheckerMaterial.qml
+        VertexColorMaterial.qml
+        ViewerMenuBar.qml
+        +nativemenubar/ViewerMenuBar.qml
+    RESOURCES
+        UVCheckerMap01.png
+        UVChecker.frag
+        UVChecker.vert
+        VertexColor.frag
+        VertexColor.vert
+    NO_RESOURCE_TARGET_PATH
 )
-
-qt6_add_resources(MeshViewer "qml"
-    PREFIX
-        "/"
-    FILES
-        ${qml_resource_files}
-)
-
-set_target_properties(MeshViewer PROPERTIES
-    QT_QML_MODULE_VERSION 1.0
-    QT_QML_MODULE_URI MeshViewer
-)
-
-qt6_qml_type_registration(MeshViewer)

@@ -32,6 +32,7 @@ import QtQuick.Layouts
 import MeshViewer
 
 ApplicationWindow {
+    id: appWindow
     width: 1280
     height: 720
     title: qsTr("Mesh File Viewer") + " " + meshInfo.meshName
@@ -65,23 +66,21 @@ ApplicationWindow {
         text: qsTr("&About")
     }
 
+    function openMeshFileAction() {
+        fileDialogHelper.openFile();
+    }
 
-    menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
-            MenuItem {
-                action: openMeshFileAction
-            }
-            MenuItem {
-                action: quitAction
-            }
-        }
-        Menu {
-            title: qsTr("&Help")
-            MenuItem {
-                action: aboutAction
-            }
-        }
+    function quitAction() {
+        Qt.quit();
+    }
+
+    function aboutAction() {
+
+    }
+
+
+    menuBar: ViewerMenuBar {
+        application: appWindow
     }
 
     MeshInfo {
@@ -89,7 +88,7 @@ ApplicationWindow {
         meshFile: fileDialogHelper.fileName
     }
 
-    Item {
+    Pane {
         anchors.fill: parent
 
         ListView {
@@ -432,19 +431,31 @@ ApplicationWindow {
                 anchors.left: settingsContainer.right
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                environment: SceneEnvironment {
-                    clearColor: colorDialogHelper.color
-                    backgroundMode: SceneEnvironment.Color
+                environment: ExtendedSceneEnvironment {
+                    backgroundMode: SceneEnvironment.SkyBox
+                    antialiasingQuality: SceneEnvironment.High
+                    antialiasingMode: SceneEnvironment.MSAA
+                    lightProbe: Texture {
+                        textureData: ProceduralSkyTextureData {
+
+                        }
+                    }
+                    skyboxBlurAmount: 0.5
+                    InfiniteGrid {
+                        id: infiniteGrid
+                        visible: axisHelpersCheckBox.checked
+                    }
                 }
 
-                PerspectiveCamera {
-                    id: camera
-                    z: 200
+                Node {
+                    id: originNode
+                    eulerRotation.x: -30
+                    PerspectiveCamera {
+                        id: cameraNode
+                        z: 200
+                    }
                 }
 
-                DirectionalLight {
-                    ambientColor: Qt.rgba(0.3, 0.3, 0.3, 1.0)
-                }
                 Node {
                     id: modelContainer
                     scale: Qt.vector3d(scaleSlider.value, scaleSlider.value, scaleSlider.value)
@@ -534,38 +545,13 @@ ApplicationWindow {
                     meshInfo: meshInfo
                     subsetIndex: listView.currentIndex
                 }
-
-                AxisHelper {
-                    visible: axisHelpersCheckBox.checked
-                }
-
-                MouseArea {
-                    id: view3DMouseArea
-                    property bool isInputActive: false
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: {
-                        isInputActive = true
-                        wasdController.focus = true
-                    }
-                    onExited: {
-                        isInputActive = false
-                        wasdController.focus = false
-                    }
-                    onPressed: {
-                        wasdController.focus = true
-                        wasdController.keysEnabled = true
-                    }
-                }
             }
 
-            WasdController {
-                id: wasdController
-                controlledObject: camera
-                mouseEnabled: view3DMouseArea.isInputActive
-                keysEnabled: view3DMouseArea.isInputActive
+            OrbitCameraController {
+                id: cameraController
+                camera: cameraNode
+                origin: originNode
             }
-
         }
     }
 }
