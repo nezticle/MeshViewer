@@ -13,8 +13,6 @@ find_package(Qt6 COMPONENTS Quick3D)
 find_package(Qt6 COMPONENTS Widgets)
 
 qt_add_executable(MeshViewer
-    colordialoghelper.cpp colordialoghelper.h
-    filedialoghelper.cpp filedialoghelper.h
     geometrygenerator.cpp geometrygenerator.h
     mesh.cpp mesh.h
     meshinfo.cpp meshinfo.h
@@ -32,7 +30,6 @@ target_link_libraries(MeshViewer PUBLIC
     Qt::Gui
     Qt::Quick
     Qt::Quick3D
-    Qt::Widgets
 )
 
 qt_add_qml_module(MeshViewer

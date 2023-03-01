@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Andy Nichols <nezticle@gmail.com>
+ * Copyright (c) 2023 Andy Nichols <nezticle@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,12 @@
  */
 
 import QtQuick
+import QtCore
 import QtQuick3D
 import QtQuick3D.Helpers
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import MeshViewer
 
 ApplicationWindow {
@@ -38,36 +40,18 @@ ApplicationWindow {
     title: qsTr("Mesh File Viewer") + " " + meshInfo.meshName
     visible: true
 
-    FileDialogHelper {
-        id: fileDialogHelper
-    }
-    ColorDialogHelper {
-        id: colorDialogHelper
-    }
-
-    Action {
-        id: openMeshFileAction
-        text: qsTr("&Open")
-        shortcut: StandardKey.Open
-        onTriggered: {
-            fileDialogHelper.openFile();
+    FileDialog {
+        id: openMeshFileDialog
+        fileMode: FileDialog.OpenFile
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)
+        nameFilters: ["Mesh file (*.mesh)"]
+        onAccepted: {
+            meshInfo.meshFile = openMeshFileDialog.currentFile
         }
-    }
-    Action {
-        id: quitAction
-        text: qsTr("&Quit")
-        shortcut: StandardKey.Quit
-        onTriggered: {
-            Qt.quit();
-        }
-    }
-    Action {
-        id: aboutAction
-        text: qsTr("&About")
     }
 
     function openMeshFileAction() {
-        fileDialogHelper.openFile();
+        openMeshFileDialog.open();
     }
 
     function quitAction() {
@@ -85,125 +69,122 @@ ApplicationWindow {
 
     MeshInfo {
         id: meshInfo
-        meshFile: fileDialogHelper.fileName
     }
 
     Pane {
         anchors.fill: parent
 
-        ListView {
-            id: listView
-            model: meshInfo.subsetListModel
-            width: 100
-            height: 200
+        RowLayout {
+            id: meshDataRow
             anchors.top: parent.top
             anchors.left: parent.left
-            clip: true
-            ScrollBar.vertical: ScrollBar { }
-            currentIndex: 0
-            delegate: Item {
+            anchors.right: parent.right
+            ListView {
+                id: listView
+                model: meshInfo.subsetListModel
                 width: 100
-                height: 25
-                //                color: "white"
+                height: 200
 
-                Text {
-                    anchors.centerIn: parent
-                    text: subsetName
-                    font.pixelSize: 16
-                }
-                MouseArea {
-                    anchors.fill: parent
+                clip: true
+                currentIndex: 0
+                ScrollIndicator.vertical: ScrollIndicator {}
+                delegate: ItemDelegate {
+                    text: subsetName === "" ? index : subsetName
+                    width: parent.width
                     onClicked: {
                         listView.currentIndex = index
                     }
                 }
-            }
-            focus: true
-            highlight: Rectangle {
-                color: "green"
-                width: 100
-                height: 25
-            }
-            header: Rectangle {
-                width: 100
-                height: 25
-                color: "#333333"
-                Text {
-                    anchors.centerIn: parent
-                    color: '#aaaaaa'
-                    text: "Subset"
-                    font.pixelSize: 16
+
+                focus: true
+                highlight: Rectangle {
+                    color: "green"
+                    width: 100
+                    height: 25
                 }
-            }
-
-            onCurrentIndexChanged: {
-                meshInfo.subsetDataTableModel.subsetIndex = currentIndex;
-                console.log("current index: " + currentIndex)
-            }
-        }
-        TableView {
-            id: tableView
-            model: meshInfo.subsetDataTableModel
-            height: 200
-            anchors.top: parent.top
-            anchors.left: listView.right
-            anchors.right: parent.right
-            topMargin: 25
-            clip: true
-            ScrollBar.vertical: ScrollBar { }
-            ScrollBar.horizontal: ScrollBar { }
-
-            columnWidthProvider: function (column) {
-                if (column === 0)
-                    return 50;
-                return 200;
-            }
-
-            // Column Header
-            Row {
-                id: columnsHeader
-                y: tableView.contentY
-                z: 2
-                Repeater {
-                    model: tableView.columns > 0 ? tableView.columns : 1
-                    Label {
-                        width: tableView.columnWidthProvider(modelData)
-                        height: 25
-                        text: meshInfo.subsetDataTableModel.headerData(modelData, Qt.Horizontal)
+                header: Rectangle {
+                    width: 100
+                    height: 25
+                    color: "#333333"
+                    Text {
+                        anchors.centerIn: parent
                         color: '#aaaaaa'
+                        text: "Subset"
                         font.pixelSize: 16
-                        padding: 10
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-
-                        background: Rectangle { color: "#333333" }
                     }
                 }
-            }
-            Connections {
-                target: meshInfo.subsetDataTableModel
-                function onModelReset() {
-                    tableView.selectedRow = -1;
-                }
-            }
 
-            property int selectedRow: -1
-            delegate: Rectangle {
-                implicitWidth: 200
-                implicitHeight: 25
-                color: row === tableView.selectedRow ? "green" : "white"
-                border.width: 1
-                Text {
-                    anchors.centerIn: parent
-                    text: display
+                onCurrentIndexChanged: {
+                    meshInfo.subsetDataTableModel.subsetIndex = currentIndex;
+                    console.log("current index: " + currentIndex)
                 }
-                MouseArea {
+            }
+            Item {
+                // Item to work around the Pane in the butt...
+                height: 200
+                Layout.fillWidth: true
+
+
+                Pane {
+                    id: tableViewContainer
                     anchors.fill: parent
-                    onClicked: {
-                        if (tableView.selectedRow != row)
-                            tableView.selectedRow = row
-                        else
-                            tableView.selectedRow = -1
+
+                    TableView {
+                        id: tableView
+                        model: meshInfo.subsetDataTableModel
+                        anchors.fill: parent
+                        anchors.topMargin: horizontalHeader.height + rowSpacing
+                        anchors.leftMargin: verticalHeader.width + columnSpacing
+                        columnSpacing: 1
+                        rowSpacing: 1
+                        syncDirection: Qt.Vertical | Qt.Horizontal
+                        implicitWidth: parent.width + columnSpacing
+                        implicitHeight: parent.height + rowSpacing
+
+                        clip: true
+
+                        Connections {
+                            target: meshInfo.subsetDataTableModel
+                            function onModelReset() {
+                                tableView.selectedRow = -1;
+                            }
+                        }
+
+                        property int selectedRow: -1
+                        delegate: Rectangle {
+                            implicitWidth: 200
+                            implicitHeight: 25
+                            color: row === tableView.selectedRow ? "green" : tableView.palette.base
+                            border.width: 1
+                            Label {
+                                anchors.centerIn: parent
+                                text: display
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (tableView.selectedRow != row)
+                                        tableView.selectedRow = row
+                                    else
+                                        tableView.selectedRow = -1
+                                }
+                            }
+                        }
+                    }
+
+                    HorizontalHeaderView {
+                        id: horizontalHeader
+                        anchors.top: parent.top
+                        anchors.left: tableView.left
+                        syncView: tableView
+                        clip: true
+                    }
+
+                    VerticalHeaderView {
+                        id: verticalHeader
+                        anchors.top: tableView.top
+                        syncView: tableView
+                        clip: true
                     }
                 }
             }
@@ -211,7 +192,7 @@ ApplicationWindow {
 
         Item {
             id: viewportContainer
-            anchors.top: tableView.bottom
+            anchors.top: meshDataRow.bottom
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.right: parent.right
@@ -239,21 +220,6 @@ ApplicationWindow {
                             id: axisHelpersCheckBox
                             checked: true
                             text: "Show Axis Helpers"
-                        }
-                        RowLayout {
-                            Label {
-                                text: "Background Color"
-                            }
-                            Rectangle {
-                                width: 75
-                                height: 25
-                                color: colorDialogHelper.color
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked:
-                                        colorDialogHelper.selectColor();
-                                }
-                            }
                         }
 
                         GroupBox {
@@ -465,6 +431,9 @@ ApplicationWindow {
                         visible: geometryGenerator.original !== null && originalViewCheckBox.checked
                         geometry: geometryGenerator.original
                         materials: PrincipledMaterial {
+                            baseColor: "grey"
+                            metalness: 0.0
+                            roughness: 0.3
                         }
                     }
                     Model {
@@ -545,12 +514,17 @@ ApplicationWindow {
                     meshInfo: meshInfo
                     subsetIndex: listView.currentIndex
                 }
-            }
+                OrbitCameraController {
+                    id: cameraController
+                    camera: cameraNode
+                    origin: originNode
+                }
 
-            OrbitCameraController {
-                id: cameraController
-                camera: cameraNode
-                origin: originNode
+                DebugView {
+                    source: view3D
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                }
             }
         }
     }
