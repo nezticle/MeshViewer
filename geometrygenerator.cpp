@@ -237,7 +237,7 @@ void GeometryGenerator::generateOriginalGeometry()
             *p++ = pos.z();
         }
         if (normals.count() == count) {
-            const auto &normal = positions.at(i);
+            const auto &normal = normals.at(i);
             *p++ = normal.x();
             *p++ = normal.y();
             *p++ = normal.z();

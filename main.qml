@@ -407,6 +407,7 @@ ApplicationWindow {
                         }
                     }
                     skyboxBlurAmount: 0.5
+                    ditheringEnabled: true
                     InfiniteGrid {
                         id: infiniteGrid
                         visible: axisHelpersCheckBox.checked
